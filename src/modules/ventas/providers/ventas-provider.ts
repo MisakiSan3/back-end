@@ -1,9 +1,8 @@
 /* eslint-disable prettier/prettier */
-import {DataSourceEnum} from '../shared/enum/data-source.enum';
 import {DataSource} from 'typeorm';
-import { Product } from '../modules/ventas/product/entities/product.entity'
-import { Category } from '../modules/ventas/category/entities/category.entity'
-import {RepositoryEnum} from '../shared/enum/repository.enum'
+import { Product } from '../product/entities/product.entity';
+import { Category } from '../category/entities/category.entity';
+import { DataSourceEnum, RepositoryEnum } from 'src/shared/enum';
  
 export const ventasProvider= [
     {
