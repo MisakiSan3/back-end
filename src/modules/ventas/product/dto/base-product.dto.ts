@@ -4,6 +4,10 @@ import { Allow, IsNotEmpty, IsNumber, IsPositive, IsString } from "class-validat
 import { Category } from "../../category/entities/category.entity";
 
 export class BaseProductDto {
+
+    @Allow()
+    readonly category: Category;
+
     @IsString()
     @IsNotEmpty()
     readonly title;
@@ -19,9 +23,5 @@ export class BaseProductDto {
 
     @IsString()
     readonly image;
-
-    @IsNumber()
-    @IsNotEmpty()
-    readonly category: Category;
 
 }
