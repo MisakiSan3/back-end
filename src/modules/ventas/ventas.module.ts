@@ -4,7 +4,7 @@ import { Global } from '@nestjs/common/decorators'
 import { ProductController } from './product/product.controller';
 import { CategoryController } from './category/category.controller';
 import { ventasProvider } from 'src/modules/ventas/providers/ventas-provider';
-import { DataBaseModuleModule } from '../database/database.module';
+import { DataBaseModuleModule } from '../database/migrations/seeds/database.module';
 
 @Global()
 @Module({

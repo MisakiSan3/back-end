@@ -1,10 +1,10 @@
 /* eslint-disable prettier/prettier */
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { Inject } from '@nestjs/common/decorators';
 import { RepositoryEnum } from 'src/shared/enum';
 import { Product } from '../product/entities/product.entity';
 import { Repository } from "typeorm/repository/Repository";
-import { CreateProductDto, ReadProductDto } from '../product/dto';
+import { CreateProductDto, FitlerProductDto, ReadProductDto } from '../product/dto';
 
 @Injectable()
 export class VentasService {
@@ -22,8 +22,24 @@ export class VentasService {
     return {data: response[0], pagination: {totalItems: response[1],limit: 10}}
   }
 
-  findAll() {
-    return `This action returns all product`;
+  async findAll(params?: FitlerProductDto): Promise<ServiceResponseHttpModel> {
+    if(params?.limit > 0 && params?.page >= 0) {
+      return this.paginateAndFilter(params);
+    }
+    const response = await this.repository.findAndCount({order: {updateAt:'DESC'},})
+    return{
+      data: plainToInstance(ReadProductDto,response[0]),
+      pagination: {totalItems: response[1],limit: 10}
+    }
+  }
+  async finOne(id: string):Promise<ServiceResponseHttpModel>{
+    const response = await this.repository.findOne({where: {id}})
+      if(!response) {
+        throw new NotFoundException('No se encuentra registros');
+        
+      }else {
+        return response;
+      }
   }
 
   findOne(id: number) {
