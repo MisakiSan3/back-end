@@ -8,7 +8,7 @@ export class BaseProductDto {
     @Allow()
     readonly category: Category;
 
-    @IsString()
+    @IsString(isIstringValidationOption())
     @IsNotEmpty()
     readonly title;
 

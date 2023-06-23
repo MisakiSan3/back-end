@@ -6,12 +6,14 @@ import { Product } from '../product/entities/product.entity';
 import { Repository } from "typeorm/repository/Repository";
 import { CreateProductDto, FitlerProductDto, PaginationProductDto, ReadProductDto, UpdateProductDto } from '../product/dto';
 import { FindOptionsWhere, ILike } from 'typeorm';
+import { ServiceResponseHttpModel } from 'src/shared/services/service-http.service';
 
 @Injectable()
 export class VentasService {
     constructor(@Inject(RepositoryEnum.PRODUCT_REPOSITORY)
     private repository: Repository<Product>
     ){}
+
   async create(payload: CreateProductDto): Promise<ServiceResponseHttpModel> {
    const newProduct =  this.repository.create(payload);
    const productCreated = await this.repository.save(newProduct);
@@ -28,7 +30,7 @@ export class VentasService {
     if(params?.limit > 0 && params?.page >= 0) {
       return this.paginateAndFilter(params);
     }
-    const response = await this.repository.findAndCount({order: {updateAt:'DESC'},})
+    const response = await this.repository.findAndCount({order: {cupdateAt:'DESC'},})
     return{
       data: plainToInstance(ReadProductDto,response[0]),
       pagination: {totalItems: response[1],limit: 10}
@@ -40,7 +42,7 @@ export class VentasService {
         throw new NotFoundException('No se encuentra registros');
         
       }else {
-        return response;
+        return {data: plainToInstance(ReadProductDto,response)};
       }
   }
   async updateOne(id: string, data: UpdateProductDto):Promise<ServiceResponseHttpModel>{
@@ -51,32 +53,35 @@ export class VentasService {
     }else{
       this.repository.merge(await response,data)
     }
-    return this.repository.save(response)
+    this.repository.save(response)
+    return {data: plainToInstance(response)}
   }
 
-  async removeOne(id: string):Promise<ServiceResponseHttpModel>{
+  async removeOne(id: string): Promise<ServiceResponseHttpModel>{
     const response = await this.repository.findBy({id});
     if(!response) {
       throw new NotFoundException('No se encuentra registros');
       
     }else{
       this.repository.softRemove(await response)
+      return {data: plainToInstance(response)}
     }
   }
-  async removeAllListeners(data: Product[]):Promise<ServiceResponseHttpModel>{
-    const response = await this.repository.softRemove(data);
+  async removeAllListeners(data: Product[]): Promise<ServiceResponseHttpModel>{
+     const response = await this.repository.softRemove(data);
+     return {data: response}
   }
   private async paginateAndFilter(params: FitlerProductDto){
     let where:
     FindOptionsWhere<Product>;
-    FindOptionsWhere<Product> [];
+    FindOptionsWhere<Product[]>;
       where = {};
       let {page,search} = params;
       const {limit} = params
       if (search) {
         search = search.trim(),
-        page= 0;
-        where = [];
+        page= 0,
+        where = [],
         where.push({name: ILike(`%${search}`)})
        
       }
@@ -90,4 +95,3 @@ export class VentasService {
   }
 }
 
-○
